@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Classes\Security;
+
+use App\Interfaces\KeyManagerInterface;
+
+class KeyManager implements KeyManagerInterface
+{
+    private const AES_METHOD = 'AES-256-ECB';
+    private const EXPECTED_KEY_LENGTH = 32; // For AES-256
+
+    private function adjustPasswordToKey(string $password): string
+    {
+        $currentLength = strlen($password);
+        if ($currentLength === self::EXPECTED_KEY_LENGTH) {
+            return $password;
+        } elseif ($currentLength < self::EXPECTED_KEY_LENGTH) {
+            // Pad with null bytes
+            return str_pad($password, self::EXPECTED_KEY_LENGTH, "\0", STR_PAD_RIGHT);
+        } else {
+            // Truncate
+            return substr($password, 0, self::EXPECTED_KEY_LENGTH);
+        }
+    }
+
+    public function encryptKey(string $aesKey, string $password): string
+    {
+        // Use plain password adjusted to 32 bytes as the key
+        $encryptionKey = $this->adjustPasswordToKey($password);
+
+        $encrypted = openssl_encrypt(
+            $aesKey,
+            self::AES_METHOD,
+            $encryptionKey,
+            OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
+        );
+
+        if ($encrypted === false) {
+            $error = openssl_error_string();
+            error_log("AES Encryption Error: " . $error);
+            throw new \Exception('Key encryption failed.');
+        }
+
+        return base64_encode($encrypted);
+    }
+
+    public function decryptKey(string $encryptedData, string $password)
+    {
+        // Use plain password adjusted to 32 bytes as the key
+        $decryptionKey = $this->adjustPasswordToKey($password);
+        $encrypted = base64_decode($encryptedData);
+
+        if ($encrypted === false) {
+            return false; // Invalid base64
+        }
+
+        $decrypted = openssl_decrypt(
+            $encrypted,
+            self::AES_METHOD,
+            $decryptionKey,
+            OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
+        );
+
+        return $decrypted;
+    }
+
+    public function generateKey(): string
+    {
+        try {
+            return random_bytes(self::EXPECTED_KEY_LENGTH);
+        } catch (\Exception $e) {
+            error_log("Key generation error: " . $e->getMessage());
+            throw new \Exception('Failed to generate secure key.');
+        }
+    }
+}

@@ -10,4 +10,6 @@ interface AuthenticationInterface {
     public function logout(): array;
     public function isLoggedIn(): bool;
     public function getCurrentUser(): ?User;
+    public function getAesKey(): ?string;
+    public function changePassword(int $userId, string $oldPassword, string $newPassword, string $confirmPassword): array;
 } 

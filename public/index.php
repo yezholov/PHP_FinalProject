@@ -36,13 +36,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $auth->logout();
                 header('Location: /?route=login');
                 exit;
+
+            case 'change-password':
+                if (!$auth->isLoggedIn()) {
+                    header('Location: /?route=login');
+                    exit;
+                }
+                $userId = $auth->getUserId(); // Assuming getUserId() exists
+                if ($userId === null) { // Should not happen if isLoggedIn is true
+                     $_SESSION['change_password_error'] = 'User not identified.';
+                     header('Location: /?route=change-password');
+                     exit;
+                }
+                $result = $auth->changePassword(
+                    $userId,
+                    $_POST['old_password'],
+                    $_POST['new_password'],
+                    $_POST['confirm_password']
+                );
+                if (isset($result['success'])) {
+                    $_SESSION['change_password_success'] = 'Password changed successfully.';
+                } else {
+                    $_SESSION['change_password_error'] = $result['error'] ?? 'Failed to change password.';
+                }
+                header('Location: /?route=change-password');
+                exit;
         }
     }
 }
 
 // Check if user is logged in
-if ($auth->isLoggedIn() && $route !== 'logout') {
-    $route = 'dashboard';
+if ($auth->isLoggedIn() && !in_array($route, ['logout', 'change-password'])) {
+    if ($route !== 'dashboard') { // Allow access to change-password even if default is dashboard
+       // $route = 'dashboard'; // Keep this commented or adjust logic if change-password should redirect to dashboard if not explicitly called
+    }
+} elseif (!in_array($route, ['login', 'register'])) {
+    // If not logged in and not trying to access login/register, redirect to login
+    // This also protects change-password from non-logged-in users if they try to access via GET
+    if ($route === 'change-password' && !$auth->isLoggedIn()) {
+         header('Location: /?route=login');
+         exit;
+    }
 }
 
 // Include the appropriate view
@@ -52,6 +86,9 @@ switch ($route) {
         break;
     case 'dashboard':
         require __DIR__ . '/../App/Views/dashboard/index.php';
+        break;
+    case 'change-password':
+        require __DIR__ . '/../App/Views/auth/change_password.php';
         break;
     default:
         require __DIR__ . '/../App/Views/auth/login.php';

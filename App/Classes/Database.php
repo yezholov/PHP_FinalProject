@@ -139,4 +139,112 @@ class Database implements DatabaseInterface, UserRepositoryInterface {
         $stmt->close();
         return $credentials;
     }
+
+    /**
+     * Retrieves the encrypted AES key for a user
+     *
+     * @param int $userId
+     * @return string|null Returns the encrypted key or null if not found
+     */
+    public function getUserKey(int $userId): ?string {
+        $sql = "SELECT aes_key_encrypted FROM user_keys WHERE user_id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("DB prepare error (getUserKey): " . $this->conn->error);
+            return null;
+        }
+        
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        
+        return $row ? $row['aes_key_encrypted'] : null;
+    }
+
+    /**
+     * Creates a new user and their associated encrypted key in a transaction
+     *
+     * @param string $username
+     * @param string $passwordHash
+     * @param string $encryptedKey
+     * @return int|false Returns new user ID or false on failure
+     */
+    public function createUserWithKey(string $username, string $passwordHash, string $encryptedKey): int|false {
+        $this->conn->begin_transaction();
+        try {
+            // Create user
+            $sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                throw new \Exception("Failed to prepare user creation statement");
+            }
+            
+            $stmt->bind_param("ss", $username, $passwordHash);
+            if (!$stmt->execute()) {
+                throw new \Exception("Failed to create user");
+            }
+            
+            $userId = $this->conn->insert_id;
+            $stmt->close();
+
+            // Create key
+            $sql = "INSERT INTO user_keys (user_id, aes_key_encrypted) VALUES (?, ?)";
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                throw new \Exception("Failed to prepare key creation statement");
+            }
+            
+            $stmt->bind_param("is", $userId, $encryptedKey);
+            if (!$stmt->execute()) {
+                throw new \Exception("Failed to store key");
+            }
+            
+            $stmt->close();
+            $this->conn->commit();
+            
+            return $userId;
+        } catch (\Exception $e) {
+            $this->conn->rollback();
+            error_log("Transaction failed: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updatePasswordAndKey(int $userId, string $newPasswordHash, string $newEncryptedKey): bool {
+        $this->conn->begin_transaction();
+        try {
+            // Update password hash in users table
+            $sqlUser = "UPDATE users SET password_hash = ? WHERE id = ?";
+            $stmtUser = $this->conn->prepare($sqlUser);
+            if (!$stmtUser) {
+                throw new \Exception("Failed to prepare user password update statement: " . $this->conn->error);
+            }
+            $stmtUser->bind_param("si", $newPasswordHash, $userId);
+            if (!$stmtUser->execute()) {
+                throw new \Exception("Failed to update user password: " . $stmtUser->error);
+            }
+            $stmtUser->close();
+
+            // Update encrypted AES key in user_keys table
+            $sqlKey = "UPDATE user_keys SET aes_key_encrypted = ? WHERE user_id = ?";
+            $stmtKey = $this->conn->prepare($sqlKey);
+            if (!$stmtKey) {
+                throw new \Exception("Failed to prepare user key update statement: " . $this->conn->error);
+            }
+            $stmtKey->bind_param("si", $newEncryptedKey, $userId);
+            if (!$stmtKey->execute()) {
+                throw new \Exception("Failed to update user key: " . $stmtKey->error);
+            }
+            $stmtKey->close();
+
+            $this->conn->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->conn->rollback();
+            error_log("Password and key update transaction failed for user {$userId}: " . $e->getMessage());
+            return false;
+        }
+    }
 } 

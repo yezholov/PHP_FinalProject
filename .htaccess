@@ -1,18 +1,25 @@
 RewriteEngine On
 RewriteBase /
 
-# Serve existing files from public directory directly
+# Redirect root to public/index.php
+RewriteRule ^$ public/index.php [L,QSA]
+
+# 1. If the requested URI (as is) exists as a file in /public, serve it
 RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
 RewriteRule ^(.*)$ public/$1 [L]
 
-# Route everything else to public/index.php
+# 2. If the previous condition is not met AND the requested URI is not a file anywhere else
+#    AND is not a directory anywhere else, THEN redirect to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ public/index.php [L,QSA]
 
 # Prevent directory listing
 Options -Indexes
 
 # Protect sensitive files
-<FilesMatch "^\.">
+<FilesMatch "^\.(ht|git|svn)">
     Order allow,deny
     Deny from all
+    Satisfy All
 </FilesMatch>
