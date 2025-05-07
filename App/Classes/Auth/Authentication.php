@@ -13,7 +13,7 @@ class Authentication implements AuthenticationInterface {
     private UserRepositoryInterface $database;
     private $keyManager;
 
-    public function __construct(KeyManagerInterface $keyManager = null) {
+    public function __construct(?KeyManagerInterface $keyManager = null) {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
