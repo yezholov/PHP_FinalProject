@@ -247,4 +247,134 @@ class Database implements DatabaseInterface, UserRepositoryInterface {
             return false;
         }
     }
+
+    /**
+     * Get all passwords for a user
+     * @param int $userId
+     * @return array
+     */
+    public function getUserPasswords(int $userId): array {
+        $sql = "SELECT id, user_id, name, password_encrypted, website, created_at, updated_at 
+               FROM passwords 
+               WHERE user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("DB prepare error (getUserPasswords): " . $this->conn->error);
+            return [];
+        }
+
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $passwords = [];
+        
+        while ($row = $result->fetch_assoc()) {
+            $passwords[] = $row;
+        }
+        
+        $stmt->close();
+        return $passwords;
+    }
+
+    /**
+     * Get a specific password by ID
+     * @param int $passwordId
+     * @param int $userId
+     * @return array|null
+     */
+    public function getPassword(int $passwordId, int $userId): ?array {
+        $sql = "SELECT id, user_id, name, password_encrypted, website, created_at, updated_at 
+               FROM passwords 
+               WHERE id = ? AND user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("DB prepare error (getPassword): " . $this->conn->error);
+            return null;
+        }
+
+        $stmt->bind_param("ii", $passwordId, $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+        $stmt->close();
+
+        return $data;
+    }
+
+    /**
+     * Create a new password entry
+     * @param int $userId
+     * @param string $name
+     * @param string $encryptedPassword
+     * @param string|null $website
+     * @return int|false
+     */
+    public function createPassword(int $userId, string $name, string $encryptedPassword, ?string $website = null): int|false {
+        $sql = "INSERT INTO passwords (user_id, name, password_encrypted, website) 
+               VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("DB prepare error (createPassword): " . $this->conn->error);
+            return false;
+        }
+
+        // Convert null website to empty string for binding
+        $website = $website ?? '';
+        $stmt->bind_param("isss", $userId, $name, $encryptedPassword, $website);
+        
+        if (!$stmt->execute()) {
+            error_log("Error creating password: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+        $passwordId = $this->conn->insert_id;
+        $stmt->close();
+        return $passwordId;
+    }
+
+    /**
+     * Update an existing password
+     * @param int $passwordId
+     * @param int $userId
+     * @param string $name
+     * @param string $encryptedPassword
+     * @param string|null $website
+     * @return bool
+     */
+    public function updatePassword(int $passwordId, int $userId, string $name, string $encryptedPassword, ?string $website = null): bool {
+        $sql = "UPDATE passwords 
+               SET name = ?, password_encrypted = ?, website = ? 
+               WHERE id = ? AND user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("DB prepare error (updatePassword): " . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param("sssii", $name, $encryptedPassword, $website, $passwordId, $userId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    /**
+     * Delete a password
+     * @param int $passwordId
+     * @param int $userId
+     * @return bool
+     */
+    public function deletePassword(int $passwordId, int $userId): bool {
+        $sql = "DELETE FROM passwords WHERE id = ? AND user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("DB prepare error (deletePassword): " . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param("ii", $passwordId, $userId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
 } 

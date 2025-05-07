@@ -64,6 +64,47 @@ class KeyManager implements KeyManagerInterface
         return $decrypted;
     }
 
+    public function encryptPassword(string $password, string $aesKey): string
+    {
+        $encrypted = openssl_encrypt(
+            $password,
+            self::AES_METHOD,
+            $aesKey,
+            OPENSSL_RAW_DATA
+        );
+
+        if ($encrypted === false) {
+            $error = openssl_error_string();
+            error_log("AES Password Encryption Error: " . $error);
+            throw new \Exception('Password encryption failed.');
+        }
+
+        return base64_encode($encrypted);
+    }
+
+    public function decryptPassword(string $encryptedPassword, string $aesKey): string
+    {
+        $decoded = base64_decode($encryptedPassword);
+        if ($decoded === false) {
+            throw new \Exception('Invalid encrypted password format.');
+        }
+
+        $decrypted = openssl_decrypt(
+            $decoded,
+            self::AES_METHOD,
+            $aesKey,
+            OPENSSL_RAW_DATA
+        );
+
+        if ($decrypted === false) {
+            $error = openssl_error_string();
+            error_log("AES Password Decryption Error: " . $error);
+            throw new \Exception('Password decryption failed.');
+        }
+
+        return $decrypted;
+    }
+
     public function generateKey(): string
     {
         try {
