@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $auth->logout();
                 header('Location: /?route=login');
                 exit;
-                break;
 
             case 'save_password':
                 if (isset($_POST['name'])) {
