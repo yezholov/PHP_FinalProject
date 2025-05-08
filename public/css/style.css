@@ -1,10 +1,436 @@
-body{
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 10px auto;
-    padding: 0;
-    width: 98vw;
-    max-width: 800px;
+body {
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+  margin: 10px auto;
+  padding: 0;
+  width: 98vw;
+  max-width: 800px;
+}
+form {
+  .form-group {
+    input {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #292929;
+      font-size: 1.2rem;
+    }
+    label {
+      font-size: 1.1rem;
+      color: #7c7c7c;
+      transition: color 0.15s ease;
+    }
+    &:has(input:focus) {
+      label {
+        color: #459be6;
+      }
+    }
+  }
+}
+body.auth {
+  max-width: 400px;
+  width: 100%;
+  div.auth-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px 20px;
+    h1 {
+      margin-block-start: 0;
+      margin-block-end: 0px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      .form-group {
+        input {
+          width: calc(100% - 12px);
+        }
+      }
+      button[type="submit"] {
+        margin-top: 15px;
+        background-color: #ffffff;
+        color: #459be6;
+        border: 1px solid #459be6;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+        &:hover {
+          background-color: #459be6;
+          color: #ffffff;
+        }
+      }
+    }
+    .auth-link {
+      text-align: center;
+      font-size: 1rem;
+      color: #7c7c7c;
+      a {
+        color: #459be6;
+        text-decoration: none;
+        transition: 0.15s linear;
+        border-bottom: 1px solid transparent;
+        &:hover {
+          border-bottom: 1px solid #459be6;
+        }
+      }
+    }
+  }
 }
 
+body.dashboard {
+  div.user-actions-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    form {
+      button[type="submit"] {
+        background-color: #ffffff;
+        color: #459be6;
+        border: 1px solid #459be6;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 1rem;
+        transition: background-color 0.15s ease, color 0.15s ease;
+        &:hover {
+          background-color: #459be6;
+          color: #ffffff;
+        }
+      }
+    }
+    div.change-password-link {
+      width: 100%;
+      text-align: center;
+      font-size: 1rem;
+      height: 34px;
+      border: 1px solid #7c7c7c;
+      background-color: #ffffff;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border-radius: 5px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      &:hover {
+        background-color: #7c7c7c;
+        a {
+          color: #ffffff;
+        }
+      }
+      a {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        color: #7c7c7c;
+      }
+    }
+  }
+  div.dashboard-container {
+    padding: 20px;
+    h1 {
+      margin-block-start: 0;
+      margin-block-end: 0px;
+      .username {
+        display: inline-block;
+        color: #459be6;
+      }
+    }
+    div.password-creation-form {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      div.form-group-container {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        .form-group {
+          width: calc(50% - 7px);
+        }
+      }
+      div.form-group {
+        input {
+          width: calc(100% - 12px);
+        }
+        padding-bottom: 10px;
+      }
+      h3.password-creation-form-title {
+        text-align: center;
+        font-size: 1.2rem;
+        padding-bottom: 20px;
+        margin-block: 0;
+      }
+      div.form-submit-button {
+        text-align: center;
+        padding-top: 20px;
+        button[type="submit"] {
+          background-color: #ffffff;
+          color: #459be6;
+          border: 1px solid #459be6;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 1.2rem;
+          transition: background-color 0.15s ease, color 0.15s ease;
+          &:hover {
+            background-color: #459be6;
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
 
+  div.password-generator-options {
+    .password-generator-options-container {
+      display: none;
+      &.active {
+        display: flex;
+      }
+      flex-direction: row;
+      gap: 10px;
+    }
+    &.active {
+      .password-generator-options-container {
+        display: flex;
+      }
+    }
+    .form-group {
+      input {
+        width: calc(100% - 12px);
+      }
+      padding-bottom: 10px;
+    }
+  }
+  table.passwords-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    border: 1px solid #c7c7c7;
+    border-collapse: collapse;
+    thead {
+      tr {
+        th {
+          padding: 5px 10px;
+          border: 1px solid #c7c7c7;
+        }
+      }
+    }
+    tbody {
+      tr {
+        td {
+          padding: 5px 10px;
+          border: 1px solid #c7c7c7;
+          &.name-column {
+            font-weight: 600;
+          }
+          &.website-column {
+            a {
+              text-decoration: none;
+              color: #459be6;
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+          &.password-column {
+            font-family: monospace;
+          }
+          &.actions-container {
+            width: 110px;
+            button {
+              padding: 5px 10px;
+              border-radius: 5px;
+              cursor: pointer;
+              transition: background-color 0.15s ease, color 0.15s ease;
+              &.delete-password-button {
+                background-color: #ffffff;
+                color: #d32f2f;
+                border: 1px solid #d32f2f;
+                &:hover {
+                  background-color: #d32f2f;
+                  color: #ffffff;
+                }
+              }
+              &.edit-password-button {
+                background-color: #ffffff;
+                color: #459be6;
+                border: 1px solid #459be6;
+                &:hover {
+                  background-color: #459be6;
+                  color: #ffffff;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+div.info-text {
+  font-size: 1rem;
+  color: #7c7c7c;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  span {
+    font-size: 1.5rem;
+  }
+  p {
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+  margin-bottom: 10px;
+}
+span.optional {
+  opacity: 0.8;
+}
+div.password-generator-options-open-close-button {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  height: 30px;
+  margin-bottom: 10px;
+  h4 {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  div {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #7c7c7c;
+    width: max-content;
+    transition: 0.15s ease;
+    &:hover {
+      background-color: #7c7c7c30;
+    }
+  }
+  .password-generator-options-close-button {
+    display: none;
+  }
+  &.active {
+    .password-generator-options-close-button {
+      display: flex;
+    }
+    .password-generator-options-open-button {
+      display: none;
+    }
+  }
+}
+div.edit-password-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  .edit-password-modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 98vw;
+    max-width: 450px;
+    border-radius: 10px;
+    h3 {
+      margin-block-start: 0;
+      margin-block-end: 0;
+      padding-bottom: 20px;
+    }
+    .password-generator-options-container.update {
+      flex-wrap: wrap;
+    }
+    .form-submit-button {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      justify-content: center;
+      button {
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+        &.update-password-button {
+          background-color: #459be6;
+          color: #ffffff;
+          border: 1px solid #ffffff;
+          &:hover {
+            background-color: #3575ad;
+            color: #ffffff;
+          }
+        }
+        &.cancel-password-update-button {
+          background-color: #ffffff;
+          color: #459be6;
+          border: 1px solid #459be6;
+          &:hover {
+            background-color: #459be617;
+          }
+        }
+      }
+    }
+  }
+}
+body.change-password {
+  .back-to-dashboard-link {
+    text-decoration: none;
+    color: #459be6;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+    span {
+      font-size: 1.5rem;
+    }
+    transition: 0.15s ease;
+    &:hover {
+      color: #3575ad;
+    }
+  }
+  .change-password-title {
+    text-align: center;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-bottom: 10px;
+    padding-top: 20px;
+  }
+}

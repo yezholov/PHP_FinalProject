@@ -8,31 +8,33 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
-<body>
-    <h1>Login</h1>
+<body class="login auth">
+    <div class="auth-container">
+        <h1>Login</h1>
 
-    <?php if (isset($error)): ?>
-        <div class="error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="error"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
 
-    <form method="POST">
-        <input type="hidden" name="action" value="login">
+        <form method="POST">
+            <input type="hidden" name="action" value="login">
 
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="register-link auth-link">
+            Don't have an account? <a href="/?route=register">Register here</a>
         </div>
-
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-
-        <button type="submit">Login</button>
-    </form>
-
-    <div class="register-link">
-        Don't have an account? <a href="/?route=register">Register here</a>
     </div>
 </body>
 

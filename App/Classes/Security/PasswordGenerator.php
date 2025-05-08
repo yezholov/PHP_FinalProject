@@ -15,24 +15,13 @@ class PasswordGenerator implements PasswordGeneratorInterface
      * {@inheritdoc}
      */
     public function generate(
-        int $length,
         int $uppercaseCount,
         int $lowercaseCount,
         int $numberCount,
         int $specialCharCount
     ): string {
-        if ($length <= 0) {
-            throw new \InvalidArgumentException('Password length must be greater than zero.');
-        }
         if ($uppercaseCount < 0 || $lowercaseCount < 0 || $numberCount < 0 || $specialCharCount < 0) {
             throw new \InvalidArgumentException('Character counts cannot be negative.');
-        }
-
-        $totalCharsSpecified = $uppercaseCount + $lowercaseCount + $numberCount + $specialCharCount;
-        if ($totalCharsSpecified !== $length) {
-            throw new \InvalidArgumentException(
-                'The sum of character counts (' . $totalCharsSpecified . ') must match the total password length (' . $length . ').'
-            );
         }
 
         $passwordChars = [];

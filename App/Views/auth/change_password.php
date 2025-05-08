@@ -20,10 +20,14 @@ unset($_SESSION['change_password_success']); // Clear after displaying
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Change Password</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_back" />
 </head>
-<body>
-    <div class="container">
-        <h2>Change Your Password</h2>
+<body class="change-password auth">
+    <div class="auth-container">
+        <div class="back-to-dashboard-link-container"><a href="/?route=dashboard" class="back-to-dashboard-link"><span class="material-symbols-outlined">
+arrow_back
+</span> Back to Dashboard</a></div>
+        <h2 class="change-password-title">Change Your Password</h2>
 
         <?php if ($error): ?>
             <p class="error"><?php echo htmlspecialchars($error); ?></p>
@@ -35,24 +39,24 @@ unset($_SESSION['change_password_success']); // Clear after displaying
         <form method="POST" action="/?route=change-password">
             <input type="hidden" name="action" value="change-password">
             
-            <div>
+            <div class="form-group">
                 <label for="old_password">Current Password:</label>
                 <input type="password" id="old_password" name="old_password" required>
             </div>
             
-            <div>
+            <div class="form-group">
                 <label for="new_password">New Password:</label>
                 <input type="password" id="new_password" name="new_password" required minlength="6">
             </div>
             
-            <div>
+            <div class="form-group">
                 <label for="confirm_password">Confirm New Password:</label>
                 <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
             </div>
             
-            <button type="submit">Change Password</button>
+            <button class="change-password-button" type="submit">Change Password</button>
         </form>
-        <p><a href="/?route=dashboard">Back to Dashboard</a></p>
+       
     </div>
 </body>
 </html> 

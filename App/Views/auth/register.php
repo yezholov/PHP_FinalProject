@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
-<body>
-    <h1>Register</h1>
+<body class="register auth">
+    <div class="auth-container">
+        <h1>Register</h1>
 
     <?php if (isset($error)): ?>
         <div class="error"><?php echo htmlspecialchars($error); ?></div>
@@ -31,8 +32,9 @@
         <button type="submit">Register</button>
     </form>
 
-    <div class="login-link">
+    <div class="login-link auth-link">
         Already have an account? <a href="/?route=login">Login here</a>
+    </div>
     </div>
 </body>
 
