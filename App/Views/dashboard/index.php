@@ -205,7 +205,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <?php if (empty($passwords)): ?>
-            <p>No passwords saved yet.</p>
+            <div class="no-passwords-saved-container">
+                <p class="no-passwords-saved">No passwords saved yet.</p>
+            </div>
         <?php else: ?>
             <table class="passwords-table">
                 <thead>
