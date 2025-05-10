@@ -49,33 +49,6 @@ class Database implements DatabaseInterface, UserRepositoryInterface {
     }
 
     /**
-     * Creates a new user in the database.
-     *
-     * @param User $user User object with username set
-     * @param string $passwordHash Hashed password
-     * @return int|false Returns the new user ID on success, false on failure
-     */
-    public function create(User $user, string $passwordHash): int|false {
-        $sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        if (!$stmt) {
-            error_log("DB prepare error (createUser): " . $this->conn->error);
-            return false;
-        }
-
-        $stmt->bind_param("ss", $user->username, $passwordHash);
-        if (!$stmt->execute()) {
-            error_log("Error creating user: " . $stmt->error);
-            $stmt->close();
-            return false;
-        }
-
-        $userId = $this->conn->insert_id;
-        $stmt->close();
-        return $userId;
-    }
-
-    /**
      * Finds a user by username and returns a User object.
      *
      * @param string $username

@@ -11,7 +11,6 @@ use App\Services\KeyManagerServiceProvider;
 class PasswordManager implements PasswordManagerInterface {
     private Database $database;
     private KeyManager $keyManager;
-    private PasswordGenerator $passwordGenerator;
 
     public function __construct(
         Database $database,
@@ -20,8 +19,7 @@ class PasswordManager implements PasswordManagerInterface {
     ) {
         $this->database = $database;
         $this->keyManager = $keyManager ?? KeyManagerServiceProvider::getInstance();
-        $this->passwordGenerator = $passwordGenerator ?? new PasswordGenerator();
-    }
+   }
 
     private function getUserPasswordsEncrypted(int $userId): array {
         try {
@@ -160,21 +158,5 @@ class PasswordManager implements PasswordManagerInterface {
             error_log("Error deleting password: " . $e->getMessage());
             return false;
         }
-    }
-
-    public function generatePassword(
-        int $length,
-        int $uppercaseCount,
-        int $lowercaseCount,
-        int $numberCount,
-        int $specialCharCount
-    ): string {
-        return $this->passwordGenerator->generate(
-            $length,
-            $uppercaseCount,
-            $lowercaseCount,
-            $numberCount,
-            $specialCharCount
-        );
     }
 }

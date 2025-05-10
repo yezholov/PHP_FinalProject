@@ -49,21 +49,4 @@ interface PasswordManagerInterface {
      * @return bool
      */
     public function deletePassword(int $passwordId, int $userId): bool;
-
-    /**
-     * Generate a new password using PasswordGenerator
-     * @param int $length
-     * @param int $uppercaseCount
-     * @param int $lowercaseCount
-     * @param int $numberCount
-     * @param int $specialCharCount
-     * @return string
-     */
-    public function generatePassword(
-        int $length,
-        int $uppercaseCount,
-        int $lowercaseCount,
-        int $numberCount,
-        int $specialCharCount
-    ): string;
 } 
