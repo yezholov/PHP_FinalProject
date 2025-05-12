@@ -23,7 +23,7 @@ class PasswordManager implements PasswordManagerInterface {
     /**
      * Get all passwords with encrypted values
      * @param int $userId
-     * @return Password[] | null
+     * @return array{id: int|null, name: string|null, password: string|null, website: string|null[]}
      */
     private function getUserPasswordsEncrypted(int $userId): array {
         try {
@@ -42,7 +42,7 @@ class PasswordManager implements PasswordManagerInterface {
     /**
      * Get all passwords with decrypted values
      * @param int $userId
-     * @return Password[] | null
+     * @return array{id: int|null, name: string|null, password: string|null, website: string|null[]}
      */
     public function getUserPasswords(int $userId): array {
         $passwords = $this->getUserPasswordsEncrypted($userId);
