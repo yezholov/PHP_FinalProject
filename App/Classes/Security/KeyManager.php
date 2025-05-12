@@ -9,6 +9,11 @@ class KeyManager implements KeyManagerInterface
     private const AES_METHOD = 'AES-256-ECB';
     private const EXPECTED_KEY_LENGTH = 32; // For AES-256
 
+    /**
+     * Adjust password to key
+     * @param string $password
+     * @return string
+     */
     private function adjustPasswordToKey(string $password): string
     {
         $currentLength = strlen($password);
@@ -22,7 +27,13 @@ class KeyManager implements KeyManagerInterface
             return substr($password, 0, self::EXPECTED_KEY_LENGTH);
         }
     }
-
+    /**
+     * Encrypt key with plain password
+     * @param string $aesKey
+     * @param string $password
+     * @throws \Exception
+     * @return string
+     */
     public function encryptKey(string $aesKey, string $password): string
     {
         // Use plain password adjusted to 32 bytes as the key
@@ -43,7 +54,12 @@ class KeyManager implements KeyManagerInterface
 
         return base64_encode($encrypted);
     }
-
+    /**
+     * Decrypt key with plain password
+     * @param string $encryptedData
+     * @param string $password
+     * @return bool|string
+     */
     public function decryptKey(string $encryptedData, string $password)
     {
         // Use plain password adjusted to 32 bytes as the key
@@ -63,7 +79,13 @@ class KeyManager implements KeyManagerInterface
 
         return $decrypted;
     }
-
+    /**
+     * Encrypt password with AES-key
+     * @param string $password
+     * @param string $aesKey
+     * @throws \Exception
+     * @return string
+     */
     public function encryptPassword(string $password, string $aesKey): string
     {
         $encrypted = openssl_encrypt(
@@ -81,7 +103,12 @@ class KeyManager implements KeyManagerInterface
 
         return base64_encode($encrypted);
     }
-
+    /**
+     * Decrypt password with AES-key
+     * @param string $encryptedPassword
+     * @param string $aesKey
+     * @return string
+     */
     public function decryptPassword(string $encryptedPassword, string $aesKey): string
     {
         $decoded = base64_decode($encryptedPassword);
@@ -104,7 +131,11 @@ class KeyManager implements KeyManagerInterface
 
         return $decrypted;
     }
-
+    /**
+     * Generate a secure key
+     * @throws \Exception
+     * @return string
+     */
     public function generateKey(): string
     {
         try {

@@ -14,13 +14,17 @@ class PasswordManager implements PasswordManagerInterface {
 
     public function __construct(
         Database $database,
-        ?KeyManager $keyManager = null,
-        ?PasswordGenerator $passwordGenerator = null
+        ?KeyManager $keyManager = null
     ) {
         $this->database = $database;
         $this->keyManager = $keyManager ?? KeyManagerServiceProvider::getInstance();
    }
 
+    /**
+     * Get all passwords with encrypted values
+     * @param int $userId
+     * @return Password[] | null
+     */
     private function getUserPasswordsEncrypted(int $userId): array {
         try {
             $this->database->beginTransaction();
@@ -38,7 +42,7 @@ class PasswordManager implements PasswordManagerInterface {
     /**
      * Get all passwords with decrypted values
      * @param int $userId
-     * @return array<array{id: int, name: string, password: string|null, website: string|null}>
+     * @return Password[] | null
      */
     public function getUserPasswords(int $userId): array {
         $passwords = $this->getUserPasswordsEncrypted($userId);
@@ -52,6 +56,12 @@ class PasswordManager implements PasswordManagerInterface {
         }, $passwords);
     }
 
+    /**
+     * Get a specific password with encrypted value
+     * @param int $passwordId
+     * @param int $userId
+     * @return Password|null
+     */
     private function getPasswordEncrypted(int $passwordId, int $userId): ?Password {
         try {
             $this->database->beginTransaction();
@@ -74,7 +84,7 @@ class PasswordManager implements PasswordManagerInterface {
      * Get a specific password with decrypted value
      * @param int $passwordId
      * @param int $userId
-     * @return array{id: int, name: string, password: string|null, website: string|null}|null
+     * @return Password[] | null
      */
     public function getPassword(int $passwordId, int $userId): ?array {
         $password = $this->getPasswordEncrypted($passwordId, $userId);
@@ -89,7 +99,15 @@ class PasswordManager implements PasswordManagerInterface {
             'website' => $password->getWebsite()
         ];
     }
-
+    /**
+     * Create a new password
+     * @param int $userId
+     * @param string $name
+     * @param string $password
+     * @param mixed $website
+     * @throws \Exception
+     * @return Password|null
+     */
     public function createPassword(int $userId, string $name, string $password, ?string $website = null): ?Password {
         try {
             if (!isset($_SESSION['aes_key'])) {
@@ -121,7 +139,16 @@ class PasswordManager implements PasswordManagerInterface {
             return null;
         }
     }
-
+    /**
+     * Update a password
+     * @param int $passwordId
+     * @param int $userId
+     * @param string $name
+     * @param string $password
+     * @param mixed $website
+     * @throws \Exception
+     * @return Password|null
+     */
     public function updatePassword(int $passwordId, int $userId, string $name, string $password, ?string $website = null): ?Password {
         try {
             if (!isset($_SESSION['aes_key'])) {
@@ -146,7 +173,12 @@ class PasswordManager implements PasswordManagerInterface {
             return null;
         }
     }
-
+    /**
+     * Delete password
+     * @param int $passwordId
+     * @param int $userId
+     * @return bool
+     */
     public function deletePassword(int $passwordId, int $userId): bool {
         try {
             $this->database->beginTransaction();

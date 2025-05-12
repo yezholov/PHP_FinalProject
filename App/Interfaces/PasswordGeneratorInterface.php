@@ -15,7 +15,7 @@ interface PasswordGeneratorInterface
      * @throws \InvalidArgumentException If parameters are invalid (e.g., sum of counts doesn't match length, or negative counts).
      * @throws \Exception If random generation fails for some reason.
      */
-    public function generate(
+     public function generate(
         int $uppercaseCount,
         int $lowercaseCount,
         int $numberCount,

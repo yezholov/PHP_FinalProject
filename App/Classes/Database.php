@@ -31,19 +31,31 @@ class Database implements DatabaseInterface, UserRepositoryInterface {
             die("Connection failed: " . $e->getMessage());
         }
     }
-
+    /**
+     * Get the database connection
+     * @return \mysqli
+     */
     public function getConnection() {
         return $this->conn;
     }
-
+    /**
+     * Begin a transaction
+     * @return bool
+     */
     public function beginTransaction(): bool {
         return $this->conn->begin_transaction();
     }
-
+    /**
+     * Commit a transaction
+     * @return bool
+     */
     public function commit(): bool {
         return $this->conn->commit();
     }
-
+    /**
+     * Rollback a transaction
+     * @return bool
+     */
     public function rollback(): bool {
         return $this->conn->rollback();
     }
@@ -184,7 +196,14 @@ class Database implements DatabaseInterface, UserRepositoryInterface {
             return false;
         }
     }
-
+    /**
+     * Update password and re-encrypt key
+     * @param int $userId
+     * @param string $newPasswordHash
+     * @param string $newEncryptedKey
+     * @throws \Exception
+     * @return bool
+     */
     public function updatePasswordAndKey(int $userId, string $newPasswordHash, string $newEncryptedKey): bool {
         $this->conn->begin_transaction();
         try {

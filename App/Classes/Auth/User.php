@@ -2,10 +2,7 @@
 
 namespace App\Classes\Auth;
 
-/**
- * Represents a User entity (Data Transfer Object).
- * Contains only user data properties and simple getters.
- */
+// Class User
 class User {
     public ?int $id = null;
     public ?string $username = null;
@@ -20,7 +17,8 @@ class User {
     }
 
     /**
-     * Gets the User ID.
+     * Get user ID
+     * @return int|null
      */
     public function getId(): ?int {
         return $this->id;

@@ -6,7 +6,7 @@ use App\Classes\Security\KeyManager;
 use App\Services\KeyManagerServiceProvider;
 
 /**
- * Represents a Password entity (Data Transfer Object).
+ * Class Password
  */
 class Password {
     public ?int $id = null;

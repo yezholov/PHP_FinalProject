@@ -21,6 +21,7 @@ class Authentication implements AuthenticationInterface {
         $this->keyManager = $keyManager ?? new KeyManager();
     }
 
+    // Register the user
     public function register(string $username, string $password): array {
         if (empty($username) || empty($password)) {
             return ['error' => 'Username and password are required.'];
@@ -45,7 +46,7 @@ class Authentication implements AuthenticationInterface {
             return ['error' => 'An internal error occurred during registration preparation.'];
         }
 
-        // Create user and key via Database service
+        // Create user and key
         $userId = $this->database->createUserWithKey($username, $hash, $encryptedKey);
 
         if ($userId === false) {
@@ -59,6 +60,7 @@ class Authentication implements AuthenticationInterface {
         return ['success' => true, 'user_id' => $userId];
     }
 
+    // Login the user
     public function login(string $username, string $password): array {
         if (empty($username) || empty($password)) {
             return ['error' => 'Username or password is empty'];
@@ -100,15 +102,14 @@ class Authentication implements AuthenticationInterface {
         return ['success' => true, 'user_id' => $credentials['id']];
     }
 
-    /**
-     * Handles the session creation part of the login process.
-     */
+    // Handles the user in the session
     private function performLogin(int $userId, string $username): void {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $userId;
         $_SESSION['username'] = $username;
     }
 
+    // Logout the user
     public function logout(): array {
         // Remove the AES key from session first
         unset($_SESSION['aes_key']);
@@ -116,6 +117,7 @@ class Authentication implements AuthenticationInterface {
         // Clear all other session data
         $_SESSION = array();
 
+        // From the documentation: https://www.php.net/manual/en/function.session-destroy.php
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
             setcookie(session_name(), '', time() - 42000,
@@ -127,11 +129,13 @@ class Authentication implements AuthenticationInterface {
         session_destroy();
         return ['success' => true];
     }
-    
+
+    // Check if the user is logged in
     public function isLoggedIn(): bool {
         return isset($_SESSION['user_id']) && isset($_SESSION['aes_key']) && is_numeric($_SESSION['user_id']);
     }
-    
+
+    // Get the current user
     public function getCurrentUser(): ?User {
         if (!$this->isLoggedIn()) {
             return null;
@@ -139,24 +143,26 @@ class Authentication implements AuthenticationInterface {
         return $this->database->findById((int)$_SESSION['user_id']);
     }
 
+    // Get the user ID from the session
     public function getUserId()
     {
         return $this->isLoggedIn() ? (int)$_SESSION['user_id'] : null;
     }
 
+    // Get the username from the session
     public function getUsername()
     {
         return $this->isLoggedIn() ? $_SESSION['username'] : null;
     }
 
-    /**
-     * Get the decrypted AES key from session
-     */
+    // Get the decrypted AES key from session
+    
     public function getAesKey(): ?string
     {
         return $_SESSION['aes_key'] ?? null;
     }
 
+    // Change the password with re-encryption key
     public function changePassword(int $userId, string $oldPassword, string $newPassword, string $confirmPassword): array
     {
         if (empty($oldPassword) || empty($newPassword) || empty($confirmPassword)) {
@@ -182,7 +188,7 @@ class Authentication implements AuthenticationInterface {
         // Fetch the currently encrypted AES key from DB
         $currentEncryptedAesKey = $this->database->getUserKey($userId);
         if (!$currentEncryptedAesKey) {
-            // This is a critical error, means user exists but has no key
+            // This is a critical error, it's should not happen
             error_log("User {$userId} has no AES key in DB during password change.");
             return ['error' => 'Could not retrieve your security key. Please contact support.'];
         }
@@ -205,7 +211,6 @@ class Authentication implements AuthenticationInterface {
             $updated = $this->database->updatePasswordAndKey($userId, $newPasswordHash, $newEncryptedAesKey);
 
             if ($updated) {
-                // IMPORTANT: Update the AES key in the current session
                 $_SESSION['aes_key'] = $plainAesKey; 
                 return ['success' => true];
             } else {
